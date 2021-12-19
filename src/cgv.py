@@ -1,19 +1,9 @@
 from bs4 import BeautifulSoup
 import requests
-import telegram
+from lib.telegram import send_message_to_chpark
 import time
 import sys
 from datetime import datetime
-
-
-def send_message_to_telegram_bot(movie_name):
-    token = "1864487873:AAExvsV1EiG-OrWWqlgdPxGDK3DpIUqCAhk"
-    chat_id = "1706764133"
-    message = movie_name + " 예약 하세요"
-    bot = telegram.Bot(token=token)
-    bot.sendMessage(chat_id=chat_id, text=message)
-    return True
-
 
 def check_move_exists(movie_name, target_date, theater_code):
     url = f'http://www.cgv.co.kr/common/showtimes/iframeTheater.aspx/iframeTheater.aspx?areacode=01&theatercode=0013&date={target_date}&screencodes=&screenratingcode=&regioncode='
@@ -42,7 +32,7 @@ def check_move_exists(movie_name, target_date, theater_code):
             if movie_already_show != movie_name:
                 continue
             print(movie_already_show)
-            return send_message_to_telegram_bot(movie_name)
+            return send_message_to_chpark(movie_name)
         return False
 
 
