@@ -43,14 +43,34 @@ def check_move_exists(movie_name, target_date):
                 if theater_type == 'IMAX LASER 2D':
                     theater_times = [{'time': screen_time.select_one('em').text.strip(), 'state': screen_time.select_one('span').text.strip()}
                                      for screen_time in theater.select("div.info-timetable > ul > li")]
-                    for theater_time in theater_times:
-                        logger.debug(theater_time['time'])
-                        logger.debug(theater_time['state'])
-
-                    if len(theater_time) > 0:
-                        # send telegram message to bot
+                    if len(theater_times) > 0:
+                        message = generate_telegram_message(f'{movie_name} 영화 상영 정보에요.', theater_times)
+                        logger.debug(message)
+                        send_message_to_chpark(message)
                         return True
         return False
+
+
+def generate_telegram_message(title, items):
+    table_config = {}
+    str_list = []
+    # dict 전체를 순회하고 최대 len을 찾아서 그다음 table render
+    str_list.append(title)
+    str_list.append('\n')
+    for item in items:
+        for key, value in item.items():
+            if key in table_config:
+                table_config[key] = len(value) if table_config[key] < len(value) else table_config[key]
+            else:
+                table_config[key] = len(value)
+    for item in items:
+        for key, value in item.items():
+            max_value_len = table_config[key]
+            len_diff = max_value_len - len(value)
+            column = f'|{value}{" " * len_diff}'
+            str_list.append(column)
+        str_list.append('|\n')
+    return ''.join(str_list)
 
 
 if __name__ == "__main__":
@@ -70,7 +90,7 @@ if __name__ == "__main__":
     else:
         logger.addHandler(logging.StreamHandler(sys.stdout))
     while True:
-        if check_move_exists("스파이더맨-노 웨이 홈", target_date, 1):
+        if check_move_exists("스파이더맨-노 웨이 홈", target_date):
             message_send_count += 1
         time.sleep(60)
         if message_send_count == 3:
