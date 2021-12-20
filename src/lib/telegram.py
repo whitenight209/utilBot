@@ -2,7 +2,7 @@ import telegram
 
 
 def get_token():
-    return "1864487873:AAExvsV1EiG-OrWWqlgdPxGDK3DpIUqCAhk"
+    return ""
 
 
 def get_chat_id():
